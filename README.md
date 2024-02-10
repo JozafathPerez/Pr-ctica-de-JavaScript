@@ -1,1 +1,1 @@
-# Pr-ctica-de-JavaScript
+# Practica-de-JavaScript
