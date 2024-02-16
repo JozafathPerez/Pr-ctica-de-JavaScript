@@ -4,6 +4,10 @@ var tablero;
 var puntaje = 0;
 var filas = 5;
 var columnas = 4;
+var numeroRandom;
+var posicionBloque = { fila: 0, columna: 0 };
+let intervaloGravedad;
+
 
 window.onload = function() {
     iniciarJuego();
@@ -12,7 +16,7 @@ window.onload = function() {
 function iniciarJuego() {
 
     // tabla = [
-    //     [0, 0, 0, 0 ],
+    //     [0, 0, 0, 2],
     //     [2, 2, 2, 0],
     //     [2, 2, 2, 2],
     //     [4, 4, 8, 8],
@@ -24,7 +28,7 @@ function iniciarJuego() {
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 0, 0]
+        [0, 0, 128, 2048]
     ]
 
     // Crea visualmente las celdas del tablero usando bucles anidados
@@ -45,10 +49,84 @@ function iniciarJuego() {
             document.getElementById("tablero").append(bloque);
         }
     }
+    generarBloque();
+    intervaloGravedad = setInterval(gravedad, 800);
+}
 
-    // Coloca dos números "2" al azar en el tablero para comenzar la partida
-    setTwo();
-    setTwo();
+function generarBloque() {
+    if (!encabezadoVacio()) {
+        return;
+    }
+
+    // Genera un bloque en la primera fila
+    numeroRandom = Math.random() < 0.5 ? 2 : 4;
+    let c = Math.floor(Math.random() * columnas);
+    tablero[0][c] =  numeroRandom; // o 4 según tu lógica
+    posicionBloque = { fila: 0, columna: c };
+    actualizarTablero();
+}
+
+function encabezadoVacio() {
+    for (let c = 0; c < columnas; c++) {
+        if (tablero[0][c] === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+function actualizarTablero() {
+    // Actualiza visualmente el tablero según la matriz actualizada
+    for (let r = 0; r < filas; r++) {
+        for (let c = 0; c < columnas; c++) {
+            let bloque = document.getElementById(r.toString() + "-" + c.toString());
+            let numero = tablero[r][c];
+            actualizarBloque(bloque, numero);
+        }
+    }
+}
+
+
+function gravedad() {
+    let tiempoEspera = 500; // 1 segundos en milisegundos
+
+    // Guardar la posición inicial antes de intentar mover
+    let filaInicial = posicionBloque.fila;
+    let columnaInicial = posicionBloque.columna;
+
+    // Intentar bajar el bloque
+    if (posicionBloque.fila < filas - 1) {
+        let proximaFila = posicionBloque.fila + 1;
+
+        if (tablero[proximaFila][posicionBloque.columna] === 0) {
+            // Caso 1: La próxima casilla (fila) está vacía, baja el bloque
+            tablero[proximaFila][posicionBloque.columna] = tablero[posicionBloque.fila][posicionBloque.columna];
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.fila = proximaFila;
+        } else if (tablero[proximaFila][posicionBloque.columna] === tablero[posicionBloque.fila][posicionBloque.columna]) {
+            // Caso 2: La próxima casilla (fila) tiene el mismo número, suma los bloques
+            tablero[proximaFila][posicionBloque.columna] *= 2;
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.fila = proximaFila;
+        }
+    }
+
+    // Verificar si el bloque cambió de posición después de 2 segundos
+    setTimeout(() => {
+        if (posicionBloque.fila === filaInicial && posicionBloque.columna === columnaInicial) {
+            // Si el bloque no cambió de posición, generar un número aleatorio
+            generarBloque();
+        }
+    }, tiempoEspera);
+
+    // Actualizar visualmente el tablero
+    actualizarTablero();
+}
+
+
+function gravedadTablero () {
+     
 }
 
 function actualizarBloque(bloque, numero) {
@@ -82,68 +160,79 @@ document.addEventListener('keyup', (e) => {
     else if (e.code == "ArrowRight") {
         deslizarDerecha();
     }
-    else if (e.code == "ArrowUp") {
-        deslizarArriba();
-
-    }
     else if (e.code == "ArrowDown") {
         deslizarAbajo();
     }
-    document.getElementById("puntaje").innerText = puntaje;
 })
 
 function deslizarIzquierda() {
-    // Implementa la lógica para deslizar los bloques hacia la izquierda
-    // Actualiza el tablero y puntaje según sea necesario
+    if (posicionBloque.columna > 0) {
+        let columnaAnterior = posicionBloque.columna - 1;
+
+        if (tablero[posicionBloque.fila][columnaAnterior] === 0) {
+            // Caso 1: La próxima casilla (columna) está vacía, mueve el bloque
+            tablero[posicionBloque.fila][columnaAnterior] = tablero[posicionBloque.fila][posicionBloque.columna];
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.columna = columnaAnterior;
+        } else if (tablero[posicionBloque.fila][columnaAnterior] === tablero[posicionBloque.fila][posicionBloque.columna]) {
+            // Caso 2: La próxima casilla (columna) tiene el mismo número, suma los bloques
+            tablero[posicionBloque.fila][columnaAnterior] *= 2;
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.columna = columnaAnterior;
+        }
+
+        // Actualizamos visualmente el tablero
+        actualizarTablero();
+    }
 }
 
 function deslizarDerecha() {
-    // Implementa la lógica para deslizar los bloques hacia la derecha
-    // Actualiza el tablero y puntaje según sea necesario
+    if (posicionBloque.columna < columnas - 1) {
+        let columnaSiguiente = posicionBloque.columna + 1;
+
+        if (tablero[posicionBloque.fila][columnaSiguiente] === 0) {
+            // Caso 1: La próxima casilla (columna) está vacía, mueve el bloque
+            tablero[posicionBloque.fila][columnaSiguiente] = tablero[posicionBloque.fila][posicionBloque.columna];
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.columna = columnaSiguiente;
+        } else if (tablero[posicionBloque.fila][columnaSiguiente] === tablero[posicionBloque.fila][posicionBloque.columna]) {
+            // Caso 2: La próxima casilla (columna) tiene el mismo número, suma los bloques
+            tablero[posicionBloque.fila][columnaSiguiente] *= 2;
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.columna = columnaSiguiente;
+        }
+
+        // Actualizamos visualmente el tablero
+        actualizarTablero();
+    }
 }
 
-function deslizarArriba() {
-    // Implementa la lógica para deslizar los bloques hacia arriba
-    // Actualiza el tablero y puntaje según sea necesario
-}
 
 function deslizarAbajo() {
-    // Implementa la lógica para deslizar los bloques hacia abajo
-    // Actualiza el tablero y puntaje según sea necesario
-}
+    if (posicionBloque.fila < filas - 1) {
+        // Si no estamos en la última fila
+        let proximaFila = posicionBloque.fila + 1;
 
-function setTwo() {
-    if (!hasEmptyTileInFirstRow()) {
-        return;
-    }
-
-    let found = false;
-    while (!found) {
-        // Columna aleatoria en la primera fila
-        let c = Math.floor(Math.random() * columnas);
-
-        if (tablero[0][c] == 0) {
-            // Decide si colocar un 2 o un 4 (con una probabilidad de 50% para cada uno)
-            let nuevoNumero = Math.random() < 0.5 ? 2 : 4;
-
-            tablero[0][c] = nuevoNumero;
-            let bloque = document.getElementById("0-" + c.toString());
-            bloque.innerText = nuevoNumero.toString();
-            bloque.classList.add("x" + nuevoNumero.toString());
-            found = true;
+        if (tablero[proximaFila][posicionBloque.columna] === 0) {
+            // Caso 1: La próxima casilla (fila) está vacía, baja el bloque
+            tablero[proximaFila][posicionBloque.columna] = tablero[posicionBloque.fila][posicionBloque.columna];
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.fila = proximaFila;
+        } else if (tablero[proximaFila][posicionBloque.columna] === tablero[posicionBloque.fila][posicionBloque.columna]) {
+            // Caso 2: La próxima casilla (fila) tiene el mismo número, suma los bloques
+            tablero[proximaFila][posicionBloque.columna] *= 2;
+            tablero[posicionBloque.fila][posicionBloque.columna] = 0;
+            posicionBloque.fila = proximaFila;
         }
+
+        // Actualizamos visualmente el tablero
+        actualizarTablero();
     }
 }
 
-function hasEmptyTileInFirstRow() {
-    for (let c = 0; c < columnas; c++) {
-        if (tablero[0][c] === 0) {
-            return true;
-        }
-    }
-    return false;
-}
 
-// Agrega un registro de consola para verificar el estado del tablero después de cada llamada a setTwo
-console.log(tablero);
+function verificarAdyacenteAbajo() {
+    // Verifica si los bloques adyacentes abajo son iguales
+    return tablero[posicionBloque.fila][posicionBloque.columna] === tablero[posicionBloque.fila + 1][posicionBloque.columna];
+}
 
