@@ -28,7 +28,7 @@ function iniciarJuego() {
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 128, 2048]
+        [0, 0, 0, 0]
     ]
 
     // Crea visualmente las celdas del tablero usando bucles anidados
@@ -50,7 +50,8 @@ function iniciarJuego() {
         }
     }
     generarBloque();
-    intervaloGravedad = setInterval(gravedad, 800);
+    intervaloGravedad = setInterval(gravedad, 1000);
+    intervaloGravedadTablero = setInterval(gravedadTablero,500)
 }
 
 function generarBloque() {
@@ -125,8 +126,26 @@ function gravedad() {
 }
 
 
+
 function gravedadTablero () {
-     
+    //Recorrer el tablero
+    for (let r = 0; r < filas; r++) {
+        for (let c = 0; c < columnas; c++) {
+            if(r != posicionBloque.fila && c != posicionBloque.columna) {
+                // Validar si hay un 0 debajo del tablero
+                if(tablero[r+1][c] == 0){
+                    tablero[r+1][c] = tablero[r][c];
+                    tablero[r][c] = 0;
+                    actualizarTablero();
+                }
+                // Validar si los elementos se pueden sumar
+                if(tablero[r][c] == tablero[r+1][c]) {
+                    tablero[r+1][c] = tablero[r][c] + tablero[r][c];
+                    tablero[r][c] = 0;
+                }
+            }
+        }
+    }
 }
 
 function actualizarBloque(bloque, numero) {
