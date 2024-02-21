@@ -21,16 +21,14 @@ window.onload = function() {
     iniciarJuego();
 }
 
-document.getElementById('btnReiniciar').addEventListener('click', pausaMenu);
-
 function iniciarJuego() {
 
     tablero = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
+        [0, 8, 0, 0],
+        [0, 2, 0, 0],
+        [0, 8, 0, 0]
     ]
 
     // Crea visualmente las celdas del tablero usando bucles anidados
@@ -127,8 +125,22 @@ function generarBloque() {
     let c = Math.floor(Math.random() * columnas);
     tablero[0][c] =  numeroRandom; // o 4 según tu lógica
     posicionBloque = { fila: 0, columna: c };
+
     actualizarTablero();
+    let bloque = document.getElementById("0-" + c.toString());
+    aplicarAnimacion(bloque);
 }
+
+function aplicarAnimacion(bloque) {
+    // Agrega temporalmente la clase de animación
+    bloque.classList.add("pop-animation");
+
+    // Espera un breve momento y luego quita la clase de animación
+    setTimeout(() => {
+        bloque.classList.remove("pop-animation");
+    }, 200);
+}
+
 
 function encabezadoVacio() {
     for (let c = 0; c < columnas; c++) {
@@ -196,26 +208,36 @@ function gravedad() {
 
 
 
-function gravedadTablero () {
-    //Recorrer el tablero
-    for (let r = 0; r < filas; r++) {
+function gravedadTablero() {
+    // Recorrer el tablero
+    for (let r = 0; r < filas - 1; r++) {
         for (let c = 0; c < columnas; c++) {
-            if(r != posicionBloque.fila && c != posicionBloque.columna) {
-                // Validar si hay un 0 debajo del tablero
-                if(tablero[r+1][c] == 0){
-                    tablero[r+1][c] = tablero[r][c];
+            if (r !== posicionBloque.fila || c !== posicionBloque.columna) {
+                // Validar si hay un 0 debajo del tablero y no estamos en la última fila
+                if (tablero[r + 1] && tablero[r + 1][c] === 0) {
+                    tablero[r + 1][c] = tablero[r][c];
                     tablero[r][c] = 0;
                     actualizarTablero();
-                }
-                // Validar si los elementos se pueden sumar
-                if(tablero[r][c] == tablero[r+1][c]) {
-                    tablero[r+1][c] = tablero[r][c] + tablero[r][c];
-                    tablero[r][c] = 0;
+                } else if (tablero[r][c] === tablero[r + 1][c]) {
+                    // Validar si los elementos se pueden sumar y si el bloque debajo no es 0
+                    if (tablero[r][c] !== 0) {
+                        tablero[r + 1][c] = tablero[r][c] * 2;
+                        tablero[r][c] = 0;
+
+                        // Actualizar visualmente el tablero después de la suma
+                        actualizarTablero();
+
+                        // Obtener el bloque actualizado
+                        let bloque = document.getElementById((r + 1).toString() + "-" + c.toString());
+                        aplicarAnimacion(bloque);
+                    }
                 }
             }
         }
     }
 }
+
+
 
 function actualizarBloque(bloque, numero) {
     // Limpia el contenido de texto y la lista de clases del bloque
@@ -270,6 +292,10 @@ function deslizarIzquierda() {
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.columna = columnaAnterior;
             // Sumar variable movimientos
+            actualizarTablero();
+
+            let bloque = document.getElementById(posicionBloque.fila.toString() + "-" + columnaAnterior.toString());
+            aplicarAnimacion(bloque);
             numeroMovientos++;
         }
 
