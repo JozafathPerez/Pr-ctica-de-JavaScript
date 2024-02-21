@@ -21,7 +21,7 @@ window.onload = function() {
     iniciarJuego();
 }
 
-document.getElementById('btnReiniciar').addEventListener('click', pausaMenu);
+
 
 function iniciarJuego() {
 
@@ -57,6 +57,7 @@ function iniciarJuego() {
     intervaloGravedad = setInterval(gravedad, 1000);
     intervaloGravedadTablero = setInterval(gravedadTablero,500)
     document.getElementById('btnAbrirMenu').addEventListener('click', pausarJuego);
+    document.getElementById('btnReiniciar').addEventListener('click',reiniciarJuego);
 }
 
 function pausarJuego() {
@@ -77,34 +78,66 @@ function pausarJuego() {
         tiempoFin = new Date;
         // Calcula la diferencia en tiempo
         let tiempoTranscurrido = tiempoFin.getTime() - tiempoInicio.getTime();
-
         // Calcula minutos y segundos
         let minutos = Math.floor(tiempoTranscurrido / 60000); // 1 minuto = 60,000 milisegundos
         let segundos = Math.floor((tiempoTranscurrido % 60000) / 1000); // 1 segundo = 1000 milisegundos
+        //Desplegar resumen
+        desplegarResumen(minutos, segundos)
         
-        //Desplegar menu
-        document.getElementById('menuDesplegable').style.display = 'flex';
-        let textoTiempo = document.getElementById("tiempo");
-        textoTiempo.innerText = `Tiempo: ${minutos}:${segundos}`;
-        let textoPiezas = document.getElementById("totales");
-        textoPiezas.innerText = "Suma de Piezas: " + sumarBloques().toString();
-        let textoMovimientos = document.getElementById("movimientos");
-        textoMovimientos.innerText = "Movientos:  " + numeroMovientos.toString();
     }
+}
+
+function desplegarResumen(pMinutos,pSegundos) {
+    //Actualizar subtitulo
+    let subtitulo = document.getElementById("subtitulo");
+    subtitulo.innerText = "Resumen";
+    //Actualizar datos
+    document.getElementById('menuDesplegable').style.display = 'flex';
+    let textoTiempo = document.getElementById("tiempo");
+    textoTiempo.innerText = `Tiempo: ${pMinutos}:${pSegundos}`;
+    let textoPiezas = document.getElementById("totales");
+    textoPiezas.innerText = "Suma de Piezas: " + sumarBloques().toString();
+    let textoMovimientos = document.getElementById("movimientos");
+    textoMovimientos.innerText = "Movientos:  " + numeroMovientos.toString();
 }
 
 function verificarVictoria() {
     for (let r = 0; r < filas; r++) {
         for (let c = 0; c < columnas; c++) {
-            if(tablero[r][c] == 16) {
-                pausarJuego();
+            if(tablero[r][c] == 8) {
+                clearInterval(intervaloGravedad);
+                //Actualizar subtitulo
+                let subtitulo = document.getElementById("subtitulo");
+                subtitulo.innerText = "¡Ganaste!";
+                //Calcular la hora
+                tiempoFin = new Date;
+                // Calcula la diferencia en tiempo
+                let tiempoTranscurrido = tiempoFin.getTime() - tiempoInicio.getTime();
+                // Calcula minutos y segundos
+                let minutos = Math.floor(tiempoTranscurrido / 60000); // 1 minuto = 60,000 milisegundos
+                let segundos = Math.floor((tiempoTranscurrido % 60000) / 1000); // 1 segundo = 1000 milisegundos
+                // Despliega el resumen
+                desplegarResumen(minutos, segundos);
+                // Inserta Boton de reinicio
+                let contendor = document.getElementById("menuDesplegable");
+                let botonReinicio = document.createElement("button");
+                
+                boton.textContent = 'Haz clic';
+                contenedor.appendChild(boton);
             }
         }
     }
 }
 
-function verificarDerrota() {
-
+function reiniciarJuego() {
+    tablero = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ]
+    intervaloGravedad = setInterval(gravedad,1000)
 }
 
 function sumarBloques() {
