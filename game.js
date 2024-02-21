@@ -14,6 +14,7 @@ let sumaPiezas = 0;
 let numeroMovientos = 0;
 let tiempoInicio;
 let tiempoFin;
+let flagJuego = true;
 
 
 
@@ -21,16 +22,14 @@ window.onload = function() {
     iniciarJuego();
 }
 
-
-
 function iniciarJuego() {
 
     tablero = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
+        [0, 8, 0, 0],
+        [0, 2, 0, 0],
+        [0, 8, 0, 0]
     ]
 
     // Crea visualmente las celdas del tablero usando bucles anidados
@@ -62,7 +61,7 @@ function iniciarJuego() {
 
 function pausarJuego() {
     //Reanudar el juego y quitar el resumen
-    if (pausaMenu){
+    if (pausaMenu ){
         intervaloGravedad = setInterval(gravedad,1000)
         console.log('Intervalo de gravedad accionado.');
         pausaMenu = false;
@@ -70,9 +69,12 @@ function pausarJuego() {
         document.getElementById('menuDesplegable').style.display = 'none';
     }
     //Pausar el juego y mostrar resumen
-    else{
+    else if (flagJuego){
         clearInterval(intervaloGravedad);
         console.log('Intervalo de gravedad detenido.');
+        // //Actualizar subtitulo
+        let subtitulo = document.getElementById("subtitulo");
+        subtitulo.textContent = "Resumen";
         pausaMenu = true;
         //Calcular la hora
         tiempoFin = new Date;
@@ -83,14 +85,14 @@ function pausarJuego() {
         let segundos = Math.floor((tiempoTranscurrido % 60000) / 1000); // 1 segundo = 1000 milisegundos
         //Desplegar resumen
         desplegarResumen(minutos, segundos)
+        //Ocultar boton
+        let botonReinicio = document.getElementById("botonReinicio");
+        botonReinicio.style.display = "none";
         
     }
 }
 
 function desplegarResumen(pMinutos,pSegundos) {
-    //Actualizar subtitulo
-    let subtitulo = document.getElementById("subtitulo");
-    subtitulo.innerText = "Resumen";
     //Actualizar datos
     document.getElementById('menuDesplegable').style.display = 'flex';
     let textoTiempo = document.getElementById("tiempo");
@@ -104,11 +106,12 @@ function desplegarResumen(pMinutos,pSegundos) {
 function verificarVictoria() {
     for (let r = 0; r < filas; r++) {
         for (let c = 0; c < columnas; c++) {
-            if(tablero[r][c] == 8) {
+            if(tablero[r][c] == 16) {
+                flagJuego = false;
                 clearInterval(intervaloGravedad);
                 //Actualizar subtitulo
                 let subtitulo = document.getElementById("subtitulo");
-                subtitulo.innerText = "¡Ganaste!";
+                subtitulo.textContent= "You Win!";
                 //Calcular la hora
                 tiempoFin = new Date;
                 // Calcula la diferencia en tiempo
@@ -119,17 +122,39 @@ function verificarVictoria() {
                 // Despliega el resumen
                 desplegarResumen(minutos, segundos);
                 // Inserta Boton de reinicio
-                let contendor = document.getElementById("menuDesplegable");
-                let botonReinicio = document.createElement("button");
-                
-                boton.textContent = 'Haz clic';
-                contenedor.appendChild(boton);
+                let botonReinicio = document.getElementById("botonReinicio");
+                botonReinicio.textContent = 'Jugar de Nuevo';
+                botonReinicio.style.display = "flex";
+                botonReinicio.addEventListener('click', reiniciarJuego);
             }
         }
     }
 }
 
+function mostrarGameOVer() {
+    //Parar el intervalo
+    flagJuego = false;
+    clearInterval(intervaloGravedad);
+    let subtitulo = document.getElementById("subtitulo");
+    subtitulo.textContent= "Game Over!";
+    //Calcular la hora
+    tiempoFin = new Date;
+    // Calcula la diferencia en tiempo
+    let tiempoTranscurrido = tiempoFin.getTime() - tiempoInicio.getTime();
+    // Calcula minutos y segundos
+    let minutos = Math.floor(tiempoTranscurrido / 60000); // 1 minuto = 60,000 milisegundos
+    let segundos = Math.floor((tiempoTranscurrido % 60000) / 1000); // 1 segundo = 1000 milisegundos
+    // Despliega el resumen
+    desplegarResumen(minutos, segundos);
+    // Inserta Boton de reinicio
+    let botonReinicio = document.getElementById("botonReinicio");
+    botonReinicio.textContent = 'Jugar de Nuevo';
+    botonReinicio.style.display = "flex";
+    botonReinicio.addEventListener('click', reiniciarJuego);
+}
+
 function reiniciarJuego() {
+    //Restablecer variables
     tablero = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -137,6 +162,13 @@ function reiniciarJuego() {
         [0, 0, 0, 0],
         [0, 0, 0, 0]
     ]
+    flagJuego =  true;
+    sumaPiezas = 0;
+    numeroMovientos = 0;
+    tiempoInicio = new Date;
+    //Quitar el menu
+    document.getElementById('menuDesplegable').style.display = 'none';
+    //Iniciar el intervalo
     intervaloGravedad = setInterval(gravedad,1000)
 }
 
@@ -160,8 +192,22 @@ function generarBloque() {
     let c = Math.floor(Math.random() * columnas);
     tablero[0][c] =  numeroRandom; // o 4 según tu lógica
     posicionBloque = { fila: 0, columna: c };
+
     actualizarTablero();
+    let bloque = document.getElementById("0-" + c.toString());
+    aplicarAnimacion(bloque);
 }
+
+function aplicarAnimacion(bloque) {
+    // Agrega temporalmente la clase de animación
+    bloque.classList.add("pop-animation");
+
+    // Espera un breve momento y luego quita la clase de animación
+    setTimeout(() => {
+        bloque.classList.remove("pop-animation");
+    }, 200);
+}
+
 
 function encabezadoVacio() {
     for (let c = 0; c < columnas; c++) {
@@ -212,7 +258,7 @@ function gravedad() {
     // Verificar si el bloque cambió de posición después de 2 segundos
     setTimeout(() => {
         if (posicionBloque.fila == 0){
-            pausarJuego();
+            mostrarGameOVer();
         }
         if (posicionBloque.fila === filaInicial && posicionBloque.columna === columnaInicial) {
             // Si el bloque no cambió de posición, generar un número aleatorio
@@ -229,26 +275,36 @@ function gravedad() {
 
 
 
-function gravedadTablero () {
-    //Recorrer el tablero
-    for (let r = 0; r < filas; r++) {
+function gravedadTablero() {
+    // Recorrer el tablero
+    for (let r = 0; r < filas - 1; r++) {
         for (let c = 0; c < columnas; c++) {
-            if(r != posicionBloque.fila && c != posicionBloque.columna) {
-                // Validar si hay un 0 debajo del tablero
-                if(tablero[r+1][c] == 0){
-                    tablero[r+1][c] = tablero[r][c];
+            if (r !== posicionBloque.fila || c !== posicionBloque.columna) {
+                // Validar si hay un 0 debajo del tablero y no estamos en la última fila
+                if (tablero[r + 1] && tablero[r + 1][c] === 0) {
+                    tablero[r + 1][c] = tablero[r][c];
                     tablero[r][c] = 0;
                     actualizarTablero();
-                }
-                // Validar si los elementos se pueden sumar
-                if(tablero[r][c] == tablero[r+1][c]) {
-                    tablero[r+1][c] = tablero[r][c] + tablero[r][c];
-                    tablero[r][c] = 0;
+                } else if (tablero[r][c] === tablero[r + 1][c]) {
+                    // Validar si los elementos se pueden sumar y si el bloque debajo no es 0
+                    if (tablero[r][c] !== 0) {
+                        tablero[r + 1][c] = tablero[r][c] * 2;
+                        tablero[r][c] = 0;
+
+                        // Actualizar visualmente el tablero después de la suma
+                        actualizarTablero();
+
+                        // Obtener el bloque actualizado
+                        let bloque = document.getElementById((r + 1).toString() + "-" + c.toString());
+                        aplicarAnimacion(bloque);
+                    }
                 }
             }
         }
     }
 }
+
+
 
 function actualizarBloque(bloque, numero) {
     // Limpia el contenido de texto y la lista de clases del bloque
@@ -303,6 +359,10 @@ function deslizarIzquierda() {
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.columna = columnaAnterior;
             // Sumar variable movimientos
+            actualizarTablero();
+
+            let bloque = document.getElementById(posicionBloque.fila.toString() + "-" + columnaAnterior.toString());
+            aplicarAnimacion(bloque);
             numeroMovientos++;
         }
 
