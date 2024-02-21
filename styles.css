@@ -17,6 +17,29 @@ hr {
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
+    border-radius: 5px;
+}
+
+#menu-container{
+    display: flex;
+    width: 100%;
+    justify-content: center; /* Centrar horizontalmente */
+
+}
+
+.menu {
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    flex-direction: column;
+    font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+    background-color: #faf8f0;
+    color: #766e66;
+    font-weight: bold;
+    border-radius: 5px;
 }
 
 .bloque {

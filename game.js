@@ -8,20 +8,22 @@ var numeroRandom;
 var posicionBloque = { fila: 0, columna: 0 };
 let intervaloGravedad;
 
+//Variables de menu de pausa
+let pausaMenu = false;
+let sumaPiezas = 0;
+let numeroMovientos = 0;
+let tiempoInicio;
+let tiempoFin;
+
+
 
 window.onload = function() {
     iniciarJuego();
 }
 
-function iniciarJuego() {
+document.getElementById('btnReiniciar').addEventListener('click', pausaMenu);
 
-    // tabla = [
-    //     [0, 0, 0, 2],
-    //     [2, 2, 2, 0],
-    //     [2, 2, 2, 2],
-    //     [4, 4, 8, 8],
-    //     [4, 4, 8, 8]
-    // ];
+function iniciarJuego() {
 
     tablero = [
         [0, 0, 0, 0],
@@ -50,8 +52,69 @@ function iniciarJuego() {
         }
     }
     generarBloque();
+    //Setea la hora de inicio
+    tiempoInicio = new Date();
     intervaloGravedad = setInterval(gravedad, 1000);
     intervaloGravedadTablero = setInterval(gravedadTablero,500)
+    document.getElementById('btnAbrirMenu').addEventListener('click', pausarJuego);
+}
+
+function pausarJuego() {
+    //Reanudar el juego y quitar el resumen
+    if (pausaMenu){
+        intervaloGravedad = setInterval(gravedad,1000)
+        console.log('Intervalo de gravedad accionado.');
+        pausaMenu = false;
+        //Quitar el menu
+        document.getElementById('menuDesplegable').style.display = 'none';
+    }
+    //Pausar el juego y mostrar resumen
+    else{
+        clearInterval(intervaloGravedad);
+        console.log('Intervalo de gravedad detenido.');
+        pausaMenu = true;
+        //Calcular la hora
+        tiempoFin = new Date;
+        // Calcula la diferencia en tiempo
+        let tiempoTranscurrido = tiempoFin.getTime() - tiempoInicio.getTime();
+
+        // Calcula minutos y segundos
+        let minutos = Math.floor(tiempoTranscurrido / 60000); // 1 minuto = 60,000 milisegundos
+        let segundos = Math.floor((tiempoTranscurrido % 60000) / 1000); // 1 segundo = 1000 milisegundos
+        
+        //Desplegar menu
+        document.getElementById('menuDesplegable').style.display = 'flex';
+        let textoTiempo = document.getElementById("tiempo");
+        textoTiempo.innerText = `Tiempo: ${minutos}:${segundos}`;
+        let textoPiezas = document.getElementById("totales");
+        textoPiezas.innerText = "Suma de Piezas: " + sumarBloques().toString();
+        let textoMovimientos = document.getElementById("movimientos");
+        textoMovimientos.innerText = "Movientos:  " + numeroMovientos.toString();
+    }
+}
+
+function verificarVictoria() {
+    for (let r = 0; r < filas; r++) {
+        for (let c = 0; c < columnas; c++) {
+            if(tablero[r][c] == 16) {
+                pausarJuego();
+            }
+        }
+    }
+}
+
+function verificarDerrota() {
+
+}
+
+function sumarBloques() {
+    sumaPiezas = 0;
+    for (let r = 0; r < filas; r++) {
+        for (let c = 0; c < columnas; c++) {
+            sumaPiezas += tablero[r][c]
+        }
+    }
+    return sumaPiezas;
 }
 
 function generarBloque() {
@@ -115,11 +178,17 @@ function gravedad() {
 
     // Verificar si el bloque cambió de posición después de 2 segundos
     setTimeout(() => {
+        if (posicionBloque.fila == 0){
+            pausarJuego();
+        }
         if (posicionBloque.fila === filaInicial && posicionBloque.columna === columnaInicial) {
             // Si el bloque no cambió de posición, generar un número aleatorio
             generarBloque();
         }
     }, tiempoEspera);
+
+    //VerificarVictoria
+    verificarVictoria()
 
     // Actualizar visualmente el tablero
     actualizarTablero();
@@ -193,11 +262,15 @@ function deslizarIzquierda() {
             tablero[posicionBloque.fila][columnaAnterior] = tablero[posicionBloque.fila][posicionBloque.columna];
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.columna = columnaAnterior;
+            // Sumar variable movimientos
+            numeroMovientos++;
         } else if (tablero[posicionBloque.fila][columnaAnterior] === tablero[posicionBloque.fila][posicionBloque.columna]) {
             // Caso 2: La próxima casilla (columna) tiene el mismo número, suma los bloques
             tablero[posicionBloque.fila][columnaAnterior] *= 2;
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.columna = columnaAnterior;
+            // Sumar variable movimientos
+            numeroMovientos++;
         }
 
         // Actualizamos visualmente el tablero
@@ -214,11 +287,15 @@ function deslizarDerecha() {
             tablero[posicionBloque.fila][columnaSiguiente] = tablero[posicionBloque.fila][posicionBloque.columna];
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.columna = columnaSiguiente;
+            // Sumar variable movimientos
+            numeroMovientos++;
         } else if (tablero[posicionBloque.fila][columnaSiguiente] === tablero[posicionBloque.fila][posicionBloque.columna]) {
             // Caso 2: La próxima casilla (columna) tiene el mismo número, suma los bloques
             tablero[posicionBloque.fila][columnaSiguiente] *= 2;
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.columna = columnaSiguiente;
+            // Sumar variable movimientos
+            numeroMovientos++;
         }
 
         // Actualizamos visualmente el tablero
@@ -237,11 +314,15 @@ function deslizarAbajo() {
             tablero[proximaFila][posicionBloque.columna] = tablero[posicionBloque.fila][posicionBloque.columna];
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.fila = proximaFila;
+            // Sumar variable movimientos
+            numeroMovientos++;
         } else if (tablero[proximaFila][posicionBloque.columna] === tablero[posicionBloque.fila][posicionBloque.columna]) {
             // Caso 2: La próxima casilla (fila) tiene el mismo número, suma los bloques
             tablero[proximaFila][posicionBloque.columna] *= 2;
             tablero[posicionBloque.fila][posicionBloque.columna] = 0;
             posicionBloque.fila = proximaFila;
+            // Sumar variable movimientos
+            numeroMovientos++;
         }
 
         // Actualizamos visualmente el tablero
