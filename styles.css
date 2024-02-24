@@ -1,24 +1,36 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
+    background-image: url('Fondo.gif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    height: 90vh;
 }
 
-hr {
-    width: 500px;
+h1 {
+    
+    font-size: 4.5em; /* Puedes ajustar el tamaño según tus preferencias */
+    color: #333; /* Color del texto */
+    text-align: center; /* Centrar el texto */
+    text-transform: uppercase; /* Convertir el texto a mayúsculas */
+    margin-bottom: 20px; /* Agregar un margen inferior para separarlo de otros elementos */
+
 }
 
 #tablero {
     width: 400px;
     height: 500px;
 
-    background-color: #cdc1b5;
-    border: 6px solid #bbada0;
-
+    background: linear-gradient( #bbada0 20%, #cdc1b5 10%);
     margin: 0 auto;
+    border-radius: 5px;
     display: flex;
     flex-wrap: wrap;
-    border-radius: 5px;
 }
+
 
 #menu-container{
     display: flex;
@@ -28,7 +40,7 @@ hr {
 }
 
 .pop-animation {
-    transform: scale(2.2);
+    transform: scale(1.8);
     transition: transform 0.4s ease-in-out;
 }
 
@@ -61,7 +73,6 @@ hr {
 
 
 /* colored tiles */
-
 .x2 {
     background-color: #eee4da;
     color: #727371;

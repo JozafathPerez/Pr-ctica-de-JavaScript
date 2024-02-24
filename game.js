@@ -27,9 +27,9 @@ function iniciarJuego() {
     tablero = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 8, 0, 0],
-        [0, 2, 0, 0],
-        [0, 8, 0, 0]
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
     ]
 
     // Crea visualmente las celdas del tablero usando bucles anidados
@@ -293,10 +293,6 @@ function gravedadTablero() {
 
                         // Actualizar visualmente el tablero después de la suma
                         actualizarTablero();
-
-                        // Obtener el bloque actualizado
-                        let bloque = document.getElementById((r + 1).toString() + "-" + c.toString());
-                        aplicarAnimacion(bloque);
                     }
                 }
             }
@@ -361,8 +357,6 @@ function deslizarIzquierda() {
             // Sumar variable movimientos
             actualizarTablero();
 
-            let bloque = document.getElementById(posicionBloque.fila.toString() + "-" + columnaAnterior.toString());
-            aplicarAnimacion(bloque);
             numeroMovientos++;
         }
 
