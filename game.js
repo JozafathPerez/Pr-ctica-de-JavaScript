@@ -26,10 +26,10 @@ function iniciarJuego() {
 
     tablero = [
         [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [0, 8, 0, 0],
-        [0, 2, 0, 0],
-        [0, 8, 0, 0]
+        [0, 8, 8, 0],
+        [0, 4, 4, 0],
+        [0, 2, 2, 0],
+        [0, 8, 4, 0]
     ]
 
     // Crea visualmente las celdas del tablero usando bucles anidados
@@ -108,6 +108,7 @@ function verificarVictoria() {
         for (let c = 0; c < columnas; c++) {
             if(tablero[r][c] == 16) {
                 flagJuego = false;
+                pausaMenu = true;
                 clearInterval(intervaloGravedad);
                 //Actualizar subtitulo
                 let subtitulo = document.getElementById("subtitulo");
@@ -123,7 +124,7 @@ function verificarVictoria() {
                 desplegarResumen(minutos, segundos);
                 // Inserta Boton de reinicio
                 let botonReinicio = document.getElementById("botonReinicio");
-                botonReinicio.textContent = 'Jugar de Nuevo';
+                //botonReinicio.textContent = 'Jugar de Nuevo';
                 botonReinicio.style.display = "flex";
                 botonReinicio.addEventListener('click', reiniciarJuego);
             }
@@ -133,6 +134,7 @@ function verificarVictoria() {
 
 function mostrarGameOVer() {
     //Parar el intervalo
+    pausaMenu = true;
     flagJuego = false;
     clearInterval(intervaloGravedad);
     let subtitulo = document.getElementById("subtitulo");
@@ -148,7 +150,7 @@ function mostrarGameOVer() {
     desplegarResumen(minutos, segundos);
     // Inserta Boton de reinicio
     let botonReinicio = document.getElementById("botonReinicio");
-    botonReinicio.textContent = 'Jugar de Nuevo';
+    //botonReinicio.textContent = 'Jugar de Nuevo';
     botonReinicio.style.display = "flex";
     botonReinicio.addEventListener('click', reiniciarJuego);
 }
@@ -162,12 +164,15 @@ function reiniciarJuego() {
         [0, 0, 0, 0],
         [0, 0, 0, 0]
     ]
+    pausaMenu = false;
     flagJuego =  true;
     sumaPiezas = 0;
     numeroMovientos = 0;
     tiempoInicio = new Date;
     //Quitar el menu
     document.getElementById('menuDesplegable').style.display = 'none';
+    //Generar bloque de juego
+    generarBloque();
     //Iniciar el intervalo
     intervaloGravedad = setInterval(gravedad,1000)
 }
@@ -232,7 +237,7 @@ function actualizarTablero() {
 
 
 function gravedad() {
-    let tiempoEspera = 500; // 1 segundos en milisegundos
+    let tiempoEspera = 1000; // 1 segundos en milisegundos
 
     // Guardar la posición inicial antes de intentar mover
     let filaInicial = posicionBloque.fila;
@@ -259,6 +264,7 @@ function gravedad() {
     setTimeout(() => {
         if (posicionBloque.fila == 0){
             mostrarGameOVer();
+            return
         }
         if (posicionBloque.fila === filaInicial && posicionBloque.columna === columnaInicial) {
             // Si el bloque no cambió de posición, generar un número aleatorio
@@ -331,13 +337,13 @@ function actualizarBloque(bloque, numero) {
 }
 
 document.addEventListener('keyup', (e) => {
-    if (e.code == "ArrowLeft") {
+    if (e.code == "ArrowLeft" && (!pausaMenu)) {
         deslizarIzquierda();
     }
-    else if (e.code == "ArrowRight") {
+    else if (e.code == "ArrowRight" && (!pausaMenu)) {
         deslizarDerecha();
     }
-    else if (e.code == "ArrowDown") {
+    else if (e.code == "ArrowDown" && (!pausaMenu)) {
         deslizarAbajo();
     }
 })
